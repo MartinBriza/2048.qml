@@ -146,8 +146,34 @@ Rectangle {
                 }
             }
 
+            transform: Scale {
+                id: zoomIn
+                origin.x: parent.x + (colorRect.width / 2)
+                origin.y: parent.y + (colorRect.height / 2)
+                xScale: 0
+                yScale: 0
+                Behavior on xScale {
+                    NumberAnimation {
+                        duration: 200
+                        easing {
+                            type: Easing.InOutQuad
+                        }
+                    }
+                }
+                Behavior on yScale {
+                    NumberAnimation {
+                        duration: 200
+                        easing {
+                            type: Easing.InOutQuad
+                        }
+                    }
+                }
+            }
+
             Component.onCompleted: {
                 number = 2
+                zoomIn.xScale = 1
+                zoomIn.yScale = 1
             }
         }
     }
