@@ -9,7 +9,7 @@ import QtQuick 2.0
 
 Rectangle {
     id: app
-    width: 450; height: 450
+    width: 450; height: 495
     color: "#888888"
     focus: true
 
@@ -17,6 +17,7 @@ Rectangle {
     property int cols: 4
     property int rows: 4
     property int finalValue: 2048
+    property int score: 0
 
     function numberAt(col, row) {
         for (var i = 0; i < numbers.length; i++) {
@@ -35,6 +36,7 @@ Rectangle {
         numbers=tmp
     }
     function purge() {
+        score = 0
         var tmp = numbers
         for (var i = 0; i < tmp.length; i++) {
             tmp[i].destroy()
@@ -90,7 +92,7 @@ Rectangle {
             property int col
             property int row
 
-            property int number
+            property int number: 2
 
             x: cells.getAt(col, row).x
             y: cells.getAt(col, row).y
@@ -103,6 +105,7 @@ Rectangle {
                     return false
                 if (app.numberAt(h, v)) {
                     number += app.numberAt(h, v).number
+                    app.score += number
                     if (number == finalValue)
                         app.victory()
                     app.popNumberAt(h, v)
@@ -135,6 +138,9 @@ Rectangle {
                     easing {
                         type: Easing.InOutQuad
                     }
+                    onStopped: {
+                        console.log("OFC")
+                    }
                 }
             }
             Behavior on y {
@@ -143,13 +149,16 @@ Rectangle {
                     easing {
                         type: Easing.InOutQuad
                     }
+                    onStopped: {
+                        console.log("OFC")
+                    }
                 }
             }
 
             transform: Scale {
                 id: zoomIn
-                origin.x: parent.x + (colorRect.width / 2)
-                origin.y: parent.y + (colorRect.height / 2)
+                origin.x: colorRect.width / 2
+                origin.y: colorRect.height / 2
                 xScale: 0
                 yScale: 0
                 Behavior on xScale {
@@ -171,53 +180,66 @@ Rectangle {
             }
 
             Component.onCompleted: {
-                number = 2
                 zoomIn.xScale = 1
                 zoomIn.yScale = 1
             }
         }
     }
 
-    Grid {
-        id: cellGrid
-        width: parent.width
-        height: parent.height
-        anchors.centerIn: parent
-        rows: app.rows
-        columns: app.cols
-        spacing: (parent.width + parent.height) / 64
+    Rectangle {
+        anchors.fill: parent
+        color: "transparent"
+        Text {
+            id: scorePanel
+            height: parent.height * 0.1
+            width: parent.width
+            anchors.top: parent.top
+            text: "Score: " + app.score
+            font.pixelSize: height * 0.8
+            horizontalAlignment: Text.AlignRight
+            verticalAlignment: Text.AlignVCenter
+        }
+        Grid {
+            id: cellGrid
+            width: parent.width
+            height: parent.height - scorePanel.height
+            anchors.bottom: parent.bottom
+            rows: app.rows
+            columns: app.cols
+            spacing: (parent.width + parent.height) / 64
 
-        property real cellWidth: (width - (columns - 1) * spacing) / columns
-        property real cellHeight: (height - (rows - 1) * spacing) / rows
+            property real cellWidth: (width - (columns - 1) * spacing) / columns
+            property real cellHeight: (height - (rows - 1) * spacing) / rows
 
-        Repeater {
-            id: cells
-            model: app.cols * app.rows
-            function getAt(h, v) {
-                return itemAt(h + v * app.cols)
-            }
-            function getRandom() {
-                return itemAt(Math.floor((Math.random() * 16)%16))
-            }
-            function getRandomFree() {
-                var free = new Array()
-                for (var i = 0; i < app.cols; i++) {
-                    for (var j = 0; j < app.rows; j++) {
-                        if (!numberAt(i, j)) {
-                            free.push(getAt(i, j))
+            Repeater {
+                id: cells
+                model: app.cols * app.rows
+                function getAt(h, v) {
+                    return itemAt(h + v * app.cols)
+                }
+                function getRandom() {
+                    return itemAt(Math.floor((Math.random() * 16)%16))
+                }
+                function getRandomFree() {
+                    var free = new Array()
+                    for (var i = 0; i < app.cols; i++) {
+                        for (var j = 0; j < app.rows; j++) {
+                            if (!numberAt(i, j)) {
+                                free.push(getAt(i, j))
+                            }
                         }
                     }
+                    return free[Math.floor(Math.random()*free.length)]
                 }
-                return free[Math.floor(Math.random()*free.length)]
-            }
-            Rectangle {
-                width: parent.cellWidth
-                height: parent.cellHeight
-                color: "#AAAAAA"
-                radius: 2
+                Rectangle {
+                    width: parent.cellWidth
+                    height: parent.cellHeight
+                    color: "#AAAAAA"
+                    radius: 2
 
-                property int col : index % app.cols
-                property int row : index / app.cols
+                    property int col : index % app.cols
+                    property int row : index / app.cols
+                }
             }
         }
     }
@@ -258,7 +280,7 @@ Rectangle {
     function gen2() {
         var tmp = numbers
         var cell = cells.getRandomFree()
-        var newNumber = number.createObject(app,{"col":cell.col,"row":cell.row})
+        var newNumber = number.createObject(cellGrid,{"col":cell.col,"row":cell.row})
         tmp.push(newNumber)
         numbers = tmp
     }
