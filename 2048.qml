@@ -92,7 +92,7 @@ Rectangle {
             property int col
             property int row
 
-            property int number: 2
+            property int number: Math.random() > 0.9 ? 4 : 2
 
             x: cells.getAt(col, row).x
             y: cells.getAt(col, row).y
