@@ -277,6 +277,36 @@ Rectangle {
             }
         }
     }
+    MouseArea {
+        anchors.fill: parent
+        property int minimumLength: app.width < app.height ? app.width / 5 : app.height / 5
+        property int startX
+        property int startY
+        onPressed: {
+            startX = mouse.x
+            startY = mouse.y
+        }
+        onReleased: {
+            var length = Math.sqrt(Math.pow(mouse.x - startX, 2) + Math.pow(mouse.y - startY, 2))
+            if (length < minimumLength)
+                return
+            var diffX = mouse.x - startX
+            var diffY = mouse.y - startY
+            // not sure what the exact angle is but it feels good
+            if (Math.abs(Math.abs(diffX) - Math.abs(diffY)) < minimumLength / 2)
+                return
+            if (Math.abs(diffX) > Math.abs(diffY))
+                if (diffX > 0)
+                    app.move(1, 0)
+                else
+                    app.move(-1, 0)
+            else
+                if (diffY > 0)
+                    app.move(0, 1)
+                else
+                    app.move(0, -1)
+        }
+    }
     function gen2() {
         var tmp = numbers
         var cell = cells.getRandomFree()
