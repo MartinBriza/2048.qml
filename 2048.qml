@@ -187,22 +187,35 @@ Rectangle {
     }
 
     Rectangle {
-        anchors.fill: parent
+        anchors.centerIn: parent
         color: "transparent"
-        Text {
-            id: scorePanel
+        height: parent.height / 32 * 31
+        width: parent.width / 32 * 31
+        Rectangle {
+            anchors.top: parent.top
             height: parent.height * 0.1
             width: parent.width
-            anchors.top: parent.top
-            text: "Score: " + app.score
-            font.pixelSize: height * 0.8
-            horizontalAlignment: Text.AlignRight
-            verticalAlignment: Text.AlignVCenter
+            opacity: 0.5
+            color: "white"
+            radius: 2
+            z: 2
+            Text {
+                id: scorePanel
+                width: parent.width / 32 * 31
+                height: parent. height / 32 * 31
+                anchors.centerIn: parent
+
+                font.pixelSize: height * 0.5
+                horizontalAlignment: Text.AlignRight
+                verticalAlignment: Text.AlignVCenter
+
+                text: "Score: " + app.score
+            }
         }
         Grid {
             id: cellGrid
             width: parent.width
-            height: parent.height - scorePanel.height
+            height: (parent.height - scorePanel.height) / 32 * 31
             anchors.bottom: parent.bottom
             rows: app.rows
             columns: app.cols
@@ -242,41 +255,54 @@ Rectangle {
                 }
             }
         }
-    }
-
-    Rectangle {
-        id: message
-        focus: true
-        anchors.fill: parent
-        opacity: 0.5
-        color: "black"
-        visible: false
-        z: 255
-        function show(text) {
-            message.visible = true
-            messageText.text = text
-        }
         Rectangle {
+            id: message
+            width: app.width
+            height: app.height
             anchors.centerIn: parent
-            width: parent.width * 0.66
-            height: parent.height * 0.33
+            opacity: 0.0
             color: "black"
+            visible: false
+            z: 1
+            function hide() {
+                visible = false
+                opacity = 0.0
+                messageText.text = ""
+            }
+            function show(text) {
+                visible = true
+                opacity = 0.5
+                messageText.text = text
+            }
             Rectangle {
-                anchors.fill: parent
-                width: parent.width - 2
-                height: parent.height -.2
-                color: "light grey"
-                Text {
+                anchors.centerIn: parent
+                width: parent.width * 0.66
+                height: parent.height * 0.33
+                color: "black"
+                Rectangle {
                     anchors.fill: parent
-                    id: messageText
-                    font.pixelSize: parent.height * 0.13
-                    anchors.centerIn: parent
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
+                    width: parent.width - 2
+                    height: parent.height -.2
+                    color: "white"
+                    Text {
+                        anchors.fill: parent
+                        id: messageText
+                        font.pixelSize: parent.height * 0.13
+                        anchors.centerIn: parent
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
+            }
+            Behavior on opacity { 
+                NumberAnimation {
+                    duration: 200
                 }
             }
         }
     }
+
+
     MouseArea {
         anchors.fill: parent
         property int minimumLength: app.width < app.height ? app.width / 5 : app.height / 5
@@ -427,7 +453,7 @@ Rectangle {
         }
         if (event.key == Qt.Key_Space) {
             app.purge()
-            message.visible = false
+            message.hide()
         }
     }
 }
