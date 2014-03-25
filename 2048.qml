@@ -138,9 +138,6 @@ Rectangle {
                     easing {
                         type: Easing.InOutQuad
                     }
-                    onStopped: {
-                        console.log("OFC")
-                    }
                 }
             }
             Behavior on y {
@@ -148,9 +145,6 @@ Rectangle {
                     duration: 50
                     easing {
                         type: Easing.InOutQuad
-                    }
-                    onStopped: {
-                        console.log("OFC")
                     }
                 }
             }
@@ -192,10 +186,11 @@ Rectangle {
         height: parent.height / 32 * 31
         width: parent.width / 32 * 31
         Rectangle {
+            id: scorePanelRect
             anchors.top: parent.top
             height: parent.height * 0.1
             width: parent.width
-            opacity: 0.5
+            opacity: 0.66
             color: "white"
             radius: 2
             z: 2
@@ -271,7 +266,7 @@ Rectangle {
             }
             function show(text) {
                 visible = true
-                opacity = 0.5
+                opacity = scorePanelRect.opacity
                 messageText.text = text
             }
             Rectangle {
