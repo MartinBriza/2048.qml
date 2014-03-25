@@ -214,7 +214,7 @@ Rectangle {
             anchors.bottom: parent.bottom
             rows: app.rows
             columns: app.cols
-            spacing: (parent.width + parent.height) / 64
+            spacing: (parent.width + parent.height) / app.rows / app.cols / 4
 
             property real cellWidth: (width - (columns - 1) * spacing) / columns
             property real cellHeight: (height - (rows - 1) * spacing) / rows
